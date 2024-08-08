@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_article_manager_document">
+        <div class="page">
+            <div class="row" style="margin-bottom:20px;">
+                <br/>
+                <table class="table table-borderless table-no-border"
+                       style="width: 90%; margin: 0 auto !important; border : 1px solid black; ">
+                    <thead style="border-bottom: 1px solid black;">
+                        <tr style="background-color: #f1f1f1; text-align: left !important;">
+                            <th style="border-right: 1px solid black !important;">
+                                <span>S/N</span>
+                            </th>
+                            <th style="border-right: 1px solid black !important;">
+                                <span>Article</span>
+                            </th>
+
+                            <th style="border-right: 1px solid black !important;">
+                                <span>Date Published</span>
+                            </th>
+
+                            <th style="border-right: 1px solid black !important;">
+                                <span>Assigned To</span>
+                            </th>
+
+                            <th style="border-right: 1px solid black !important;">
+                                <span>Date Completed</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-set="counter" t-value="1" />
+                        <t t-foreach="docs" t-as="o">
+                            <tr style="height : 30px;  border-top: 0px solid #ddd !important;">
+                                <td style="border-right: 1px solid black !important;">
+                                    <span t-esc="counter"/>
+                                </td>
+                                <td style="border-right: 1px solid black !important;">
+                                    <span t-field="o.name"/>
+                                </td>
+                                <td style="border-right: 1px solid black !important;">
+                                    <span t-field="o.publish_date"/>
+                                </td>
+                                <td style="border-right: 1px solid black !important;">
+                                    <span t-field="o.assigned_to.name"/>
+                                </td>
+                                <td style="border-right: 1px solid black !important;">
+                                    <span t-field="o.finished_date"/>
+                                </td>
+                            </tr>
+                            <t t-set="counter" t-value="counter + 1" />
+                        </t>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </template>
+
+    <template id="report_article">
+        <style>
+            .table-no-border>thead>tr>th,
+            .table-no-border>tbody>tr>th,
+            .table-no-border>tfoot>tr>th,
+            .table-no-border>thead>tr>td,
+            .table-no-border>tbody>tr>td,
+            .table-no-border>tfoot>tr>td {
+                border-top: 0px solid #ddd !important;
+            }
+            .table.table-borderless td, .table.table-borderless th {
+                border: 0 !important;
+            }
+
+            .table.table-borderless {
+                margin-bottom: 0px;
+            }
+        </style>
+        <t t-call="web.html_container">
+            <div class="container">
+                        <div class="article" t-att-data-oe-model="docs[0] and docs[0]._name" t-att-data-oe-id="docs[0] and docs[0].id">
+                            <t t-call="content_manager.report_article_manager_document" t-lang="''"/>
+                        </div>
+            </div>
+        </t>
+    </template>
+</odoo>

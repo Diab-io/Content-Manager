@@ -23,7 +23,7 @@ class ArticleController(http.Controller):
             return False
 
     #Api endpoint definitions
-    @http.route('/api/content_manager/create', auth='none', type='json', methods=['POST'])
+    @http.route('/api/content_manager/create', auth='user', type='json', methods=['POST'])
     def create_article(self, **kw):
         """ Api endpoint for the creation of articles """
         try:
@@ -52,7 +52,7 @@ class ArticleController(http.Controller):
             return self.prepare_response(response=e, stat='error')
         
     
-    @http.route('/api/content_manager/delete/<int:id>', auth='none', type='json', methods=['DELETE'])
+    @http.route('/api/content_manager/delete/<int:id>', auth='user', type='json', methods=['DELETE'])
     def delete_article(self, id):
         """ Endpoint for record deletion """
         try:
@@ -75,7 +75,7 @@ class ArticleController(http.Controller):
         except Exception as e:
             return self.prepare_response(response=e, stat='error')
 
-    @http.route('/api/content_manager/update/<int:id>', auth='none', type='json', methods=['POST'])
+    @http.route('/api/content_manager/update/<int:id>', auth='user', type='json', methods=['POST'])
     def update_article(self, id, **kw):
         response = []
         try:
@@ -112,13 +112,7 @@ class ArticleController(http.Controller):
         except Exception as e:
             return self.prepare_response(response=e, stat='error')
 
-    @http.route('/web/session/authenticate', type='json', auth='none')
-    def authenticate(self, **kw):
-        _logger.info(f'------------- {kw}')
-        request.session.authenticate(request.session.db, 'odimayodavid7@gmail.com', 'odimdavid2003')
-        return request.env['ir.http'].session_info()
-
-    @http.route('/api/content_manager/retrieve', auth='none', type='http', methods=['GET'])
+    @http.route('/api/content_manager/retrieve', auth='user', type='http', methods=['GET'])
     def fetch_record(self, **kw):
         """ Endpoint to fetch whole data or user specific data """
         try:
