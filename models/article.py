@@ -1,14 +1,23 @@
 from odoo import api, fields, models, _
+import logging
+
+_logger = logging.getLogger(__name__)
 
 class Articles(models.Model):
     _name = 'article.article'
     _description = 'Articles'
 
-    def get_reader_status(self):
-        return self.env.user.has_group('article_manager.group_article_reader')
-    
-    def get_manager_status(self):
-        return self.env.user.has_group('article_manager.group_article_manager')
+    def get_manager(self):
+        logged_in_user = self.env.user
+        if logged_in_user.has_group('content_manager.group_article_manager'):
+            return True
+        return False
+
+    def get_reader(self):
+        logged_in_user = self.env.user
+        if logged_in_user.has_group('content_manager.group_article_reader'):
+            return True
+        return False
 
     name = fields.Char()
     author = fields.Many2one('res.partner', string='Author', default=lambda self: self.env.user.partner_id.id)
@@ -18,11 +27,39 @@ class Articles(models.Model):
     start_date = fields.Date(string='Start Date')
     publish_date = fields.Date('Publish Date')
     finished_date = fields.Date('Finished Date')
-    is_article_manager = fields.Boolean('Manager', store=False, default=lambda self: self.get_manager_status())
-    is_article_reader = fields.Boolean('Reader', store=False, default=lambda self: self.get_reader_status())
+    is_article_manager = fields.Boolean('Manager', default=lambda self: self.get_manager())
+    is_article_reader = fields.Boolean('Reader', default=lambda self: self.get_reader())
     deadline = fields.Date('Deadline')
     image = fields.Binary(string='Image')
     state = fields.Selection([('open', 'Open'), ('reading', 'reading'), ('read', 'read'), ('abandoned', 'abandoned')], default='open')
+
+    # @api.depends('assigned_to')
+    # def _compute_is_article_manager(self):
+    #     for record in self:
+    #         record.is_article_manager = self.env.user.has_group('your_module.group_article_manager')
+    
+    # @api.depends('assigned_to')
+    # def _compute_is_article_reader(self):
+    #     for record in self:
+    #         record.is_article_reader = self.env.user.has_group('your_module.group_article_reader')
+
+    def write(self, vals):
+        if 'state' in vals and vals['state'] == 'reading':
+            vals['start_date'] = fields.Date.today()
+
+        elif 'state' in vals and vals['state'] == 'read':
+            author = self.author
+            email_values = {'title': self.title, 'reader': self.assigned_to.name}
+
+            template_id = self.env.ref('content_manager.article_mail_template').id
+            template = self.env['mail.template'].browse(template_id)
+            template.with_context(email_values).sudo().send_mail(author.id, force_send=True)
+
+            vals['finished_date'] = fields.Date.today()
+
+        res = super().write(vals)
+        return res
+
 
     def action_reading(self):
         self.write({'state':'reading'})

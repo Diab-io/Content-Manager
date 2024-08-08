@@ -1,30 +1,59 @@
 <?xml version='1.0' encoding='utf-8'?>
 <odoo>
+    <record id="view_article_article_filter" model="ir.ui.view">
+        <field name="name">article.article.filter</field>
+        <field name="model">article.article</field>
+        <field name="arch" type="xml">
+            <search string="Filter Article">
+                <field name="author" filter_domain="[('author', 'ilike', self)]"/>
+                <field name="title" filter_domain="[('title', 'ilike', self)]"/>
+                <field name="assigned_to" filter_domain="[('assigned_to', 'ilike', self)]"/>
+                <field name="state" filter_domain="[('state', 'ilike', self)]"/>
+                <field name="deadline" filter_domain="[('deadline', 'ilike', self)]"/>
+                <field name="publish_date" filter_domain="[('publish_date', 'ilike', self)]"/>
+                <filter string="Author" name="author" domain="[('author', '!=', False)]"/>
+                <filter string="Title" name="title" domain="[('title', '!=', False)]"/>
+                <filter string="Assigned To" name="assigned_to" domain="[('assigned_to', '!=', False)]"/>
+                <filter string="State" name="state" domain="[('state', '!=', False)]"/>
+                <filter string="Deadline" name="deadline" domain="[('deadline', '!=', False)]"/>
+                <filter string="Publish Date" name="publish_date" domain="[('publish_date', '!=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Author" name="author" domain="[]" context="{'group_by': 'author'}"/>
+                    <filter name="assigned_to" string="Assigned To" domain="[]" context="{'group_by': 'assigned_to'}"/>
+                    <filter string="Publish Date" name="publish_date" domain="[]" context="{'group_by': 'publish_date'}"/>
+                    <filter string="Deadline" name="deadline" domain="[]" context="{'group_by': 'deadline'}"/>
+                    <filter string="State" name="state" domain="[]" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
     <record id="view_content_manager_form" model="ir.ui.view">
         <field name="name">article.article.form</field>
         <field name="model">article.article</field>
         <field name="arch" type="xml">
             <form string="Articles">
                 <header>
-                    <button name="action_reading" string="Reading" states="open" class="oe_highlight" type="object"/>
-                    <button name="action_read" string="Read" states="reading" class="oe_highlight" type="object"/>
-                    <button name="action_abandoned" string="Abandon" states="open,reading" type="object"/>
+                    <button name="action_reading" string="Reading" states="open" class="oe_highlight" type="object" groups="content_manager.group_article_reader"/>
+                    <button name="action_read" string="Read" states="reading" class="oe_highlight" type="object" groups="content_manager.group_article_reader"/>
+                    <button name="action_abandoned" string="Abandon" states="open,reading" type="object" groups="content_manager.group_article_reader"/>
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
                     <group>
                         <group>
+                            <field name="is_article_manager" invisible="1"/>
+                            <field name="is_article_reader" invisible="1"/>
                             <field name="author" required="1" readonly="1"/>
-                            <field name="assigned_to" required="1"/>
-                            <field name="publish_date" required="1"/>
+                            <field name="assigned_to" required="1" attrs="{'readonly':['|', ('is_article_reader' , '=', True), ('state' , 'in', ['read', 'abandoned'])]}"/>
+                            <field name="publish_date" required="1" attrs="{'readonly':['|', ('is_article_reader' , '=', True), ('state' , 'in', ['read', 'abandoned'])]}"/>
                             <field name="start_date" readonly="1" force_save="1"/>
-                            <field name="content" required="1"/>
+                            <field name="content" required="1" />
                         </group>
                         <group>
-                            <field name="title" required="1"/>
-                            <field name="deadline" required="1"/>
-                            <field name="finished_date" readonly="1" force_save="1"/>
-                            <field name="image" widget="image"/>
+                            <field name="title" required="1" attrs="{'readonly':['|', ('is_article_reader' , '=', True), ('state' , 'in', ['read', 'abandoned'])]}"/>
+                            <field name="deadline" required="1" attrs="{'readonly':['|', ('is_article_reader' , '=', True), ('state' , 'in', ['read', 'abandoned'])]}"/>
+                            <field name="finished_date" readonly="1"/>
+                            <field name="image" widget="image" attrs="{'readonly':['|', ('is_article_reader' , '=', True), ('state' , 'in', ['read', 'abandoned'])]}"/>
                         </group>
                     </group>
                 </sheet>
@@ -36,7 +65,7 @@
         <field name="name">article.article.tree</field>
         <field name="model">article.article</field>
         <field name="arch" type="xml">
-            <tree>
+            <tree decoration-danger="state == 'abandoned'">
                 <field name="title" />
                 <field name="author"/>
                 <field name="publish_date"/>
