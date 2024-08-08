@@ -1,6 +1,9 @@
 from odoo import http
 from odoo.http import request
 from datetime import datetime
+import logging
+
+_logger = logging.getLogger(__name__)
 
 class ArticleController(http.Controller):
 
@@ -20,7 +23,7 @@ class ArticleController(http.Controller):
             return False
 
     #Api endpoint definitions
-    @http.route('/api/content_manager/create', auth='user', type='json')
+    @http.route('/api/content_manager/create', auth='none', type='json', methods=['POST'])
     def create_article(self, **kw):
         """ Api endpoint for the creation of articles """
         try:
@@ -49,7 +52,7 @@ class ArticleController(http.Controller):
             return self.prepare_response(response=e, stat='error')
         
     
-    @http.route('/api/content_manager/delete/<int:id>', auth='user', type='json')
+    @http.route('/api/content_manager/delete/<int:id>', auth='none', type='json', methods=['DELETE'])
     def delete_article(self, id):
         """ Endpoint for record deletion """
         try:
@@ -72,7 +75,7 @@ class ArticleController(http.Controller):
         except Exception as e:
             return self.prepare_response(response=e, stat='error')
 
-    @http.route('/api/content_manager/update/<int:id>', auth='user', type='json')
+    @http.route('/api/content_manager/update/<int:id>', auth='none', type='json', methods=['POST'])
     def update_article(self, id, **kw):
         response = []
         try:
@@ -109,13 +112,18 @@ class ArticleController(http.Controller):
         except Exception as e:
             return self.prepare_response(response=e, stat='error')
 
+    @http.route('/web/session/authenticate', type='json', auth='none')
+    def authenticate(self, **kw):
+        _logger.info(f'------------- {kw}')
+        request.session.authenticate(request.session.db, 'odimayodavid7@gmail.com', 'odimdavid2003')
+        return request.env['ir.http'].session_info()
 
-    @http.route('/api/content_manager/retrieve', auth='user', type='json')
+    @http.route('/api/content_manager/retrieve', auth='none', type='http', methods=['GET'])
     def fetch_record(self, **kw):
         """ Endpoint to fetch whole data or user specific data """
         try:
             if request.env.user.has_group('content_manager.group_article_manager'):
-                articles = request.env['article.article'].search([])
+                articles = request.env['article.article'].sudo().search([])
 
             elif request.env.user.has_group('content_manager.group_article_reader'):
                 user_id = request.env.user.partner_id.id

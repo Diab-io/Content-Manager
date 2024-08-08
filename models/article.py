@@ -1,4 +1,5 @@
 from odoo import api, fields, models, _
+from odoo.exceptions import UserError
 import logging
 
 _logger = logging.getLogger(__name__)
@@ -6,6 +7,8 @@ _logger = logging.getLogger(__name__)
 class Articles(models.Model):
     _name = 'article.article'
     _description = 'Articles'
+    _inherit = ['portal.mixin', 'mail.thread',
+        'mail.activity.mixin']
 
     def get_manager(self):
         logged_in_user = self.env.user
@@ -27,21 +30,19 @@ class Articles(models.Model):
     start_date = fields.Date(string='Start Date')
     publish_date = fields.Date('Publish Date')
     finished_date = fields.Date('Finished Date')
-    is_article_manager = fields.Boolean('Manager', default=lambda self: self.get_manager())
-    is_article_reader = fields.Boolean('Reader', default=lambda self: self.get_reader())
+    is_article_manager = fields.Boolean('Manager', compute='_compute_is_article_manager')
+    is_article_reader = fields.Boolean('Reader', compute='_compute_is_article_reader')
     deadline = fields.Date('Deadline')
     image = fields.Binary(string='Image')
     state = fields.Selection([('open', 'Open'), ('reading', 'reading'), ('read', 'read'), ('abandoned', 'abandoned')], default='open')
 
-    # @api.depends('assigned_to')
-    # def _compute_is_article_manager(self):
-    #     for record in self:
-    #         record.is_article_manager = self.env.user.has_group('your_module.group_article_manager')
+    def _compute_is_article_manager(self):
+        for record in self:
+            record.is_article_manager = self.env.user.has_group('content_manager.group_article_manager')
     
-    # @api.depends('assigned_to')
-    # def _compute_is_article_reader(self):
-    #     for record in self:
-    #         record.is_article_reader = self.env.user.has_group('your_module.group_article_reader')
+    def _compute_is_article_reader(self):
+        for record in self:
+            record.is_article_reader = self.env.user.has_group('content_manager.group_article_reader')
 
     def write(self, vals):
         if 'state' in vals and vals['state'] == 'reading':
@@ -77,6 +78,8 @@ class Articles(models.Model):
     
     @api.model_create_multi
     def create(self, values):
+        if self.env.user.has_group('content_manager.group_article_reader'):
+            raise UserError(_('You are not allowed to create an article'))
         for val in values:
             val['name'] = val['title']
         return super().create(values)

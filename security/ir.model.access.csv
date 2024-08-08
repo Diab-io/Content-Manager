@@ -1,2 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-content_manager.access_article_article,access_article_article,content_manager.model_article_article,base.group_user,1,1,1,1
+content_manager.access_article_manager,access_article_article,content_manager.model_article_article,content_manager.group_article_manager,1,1,1,1
+content_manager.access_article_reader,access_article_article,content_manager.model_article_article,content_manager.group_article_reader,1,1,0,0

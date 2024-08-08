@@ -2,29 +2,29 @@
           <!-- demo data uses IDs of standard odoo system demo users such as marc Demo and Michelle Admin -->
           <record id="record_1" model="article.article" forcecreate="1">
             <field name="author">3</field> 
-            <field name="title">The Corona Virus Pandemic</field>
+            <field name="title">The 2024 paris olympics</field>
             <field name="assigned_to">7</field>
-            <field name="publish_date">2024-05-06</field>
-            <field name="deadline">2024-05-31</field>
-            <field name="content">The Corona Virus Pandemic</field>
+            <field name="publish_date">2024-08-08</field>
+            <field name="deadline">2024-08-12</field>
+            <field name="content">The 2024 olympics has produced some WR</field>
           </record>
 
           <record id="record_2" model="article.article" forcecreate="1">
             <field name="author">3</field> 
-            <field name="title">The Value of Tech in Asia Minor</field>
+            <field name="title">Premier league football</field>
             <field name="assigned_to">7</field>
-            <field name="publish_date">2024-05-01</field>
-            <field name="deadline">2024-05-25</field>
-            <field name="content">The Value of Tech in Asia Minor</field>
+            <field name="publish_date">2024-08-08</field>
+            <field name="deadline">2024-08-20</field>
+            <field name="content">EPL will be back in few days</field>
           </record>
 
           <record id="record_3" model="article.article" forcecreate="1">
             <field name="author">3</field> 
-            <field name="title">Why Arsenal Cannot Win EPL after 30 Years</field>
+            <field name="title">Human Rights activists protest</field>
             <field name="assigned_to">7</field>
-            <field name="publish_date">2024-04-15</field>
-            <field name="deadline">2024-05-10</field>
-            <field name="content">Why Arsenal Cannot Win EPL after 30 Years</field>
+            <field name="publish_date">2024-08-08</field>
+            <field name="deadline">2024-08-24</field>
+            <field name="content">Fundamental human rights is necessary for better quality of life</field>
           </record>
 
 </odoo>
