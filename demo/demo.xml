@@ -1,0 +1,30 @@
+<odoo noupdate="1">
+          <!-- demo data uses IDs of standard odoo system demo users such as marc Demo and Michelle Admin -->
+          <record id="record_1" model="article.article" forcecreate="1">
+            <field name="author">3</field> 
+            <field name="title">The Corona Virus Pandemic</field>
+            <field name="assigned_to">7</field>
+            <field name="publish_date">2024-05-06</field>
+            <field name="deadline">2024-05-31</field>
+            <field name="content">The Corona Virus Pandemic</field>
+          </record>
+
+          <record id="record_2" model="article.article" forcecreate="1">
+            <field name="author">3</field> 
+            <field name="title">The Value of Tech in Asia Minor</field>
+            <field name="assigned_to">7</field>
+            <field name="publish_date">2024-05-01</field>
+            <field name="deadline">2024-05-25</field>
+            <field name="content">The Value of Tech in Asia Minor</field>
+          </record>
+
+          <record id="record_3" model="article.article" forcecreate="1">
+            <field name="author">3</field> 
+            <field name="title">Why Arsenal Cannot Win EPL after 30 Years</field>
+            <field name="assigned_to">7</field>
+            <field name="publish_date">2024-04-15</field>
+            <field name="deadline">2024-05-10</field>
+            <field name="content">Why Arsenal Cannot Win EPL after 30 Years</field>
+          </record>
+
+</odoo>
