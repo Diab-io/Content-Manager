@@ -9,20 +9,8 @@ class Articles(models.Model):
     _description = 'Articles'
     _inherit = ['portal.mixin', 'mail.thread',
         'mail.activity.mixin']
+    _rec_name = 'title'
 
-    def get_manager(self):
-        logged_in_user = self.env.user
-        if logged_in_user.has_group('content_manager.group_article_manager'):
-            return True
-        return False
-
-    def get_reader(self):
-        logged_in_user = self.env.user
-        if logged_in_user.has_group('content_manager.group_article_reader'):
-            return True
-        return False
-
-    name = fields.Char()
     author = fields.Many2one('res.partner', string='Author', default=lambda self: self.env.user.partner_id.id)
     assigned_to = fields.Many2one('res.partner', string='Assigned To')
     content = fields.Char(string='Content')
@@ -74,12 +62,3 @@ class Articles(models.Model):
     
     def action_abandoned(self):
         self.write({'state':'abandoned'})
-
-    
-    @api.model_create_multi
-    def create(self, values):
-        if self.env.user.has_group('content_manager.group_article_reader'):
-            raise UserError(_('You are not allowed to create an article'))
-        for val in values:
-            val['name'] = val['title']
-        return super().create(values)
