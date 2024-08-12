@@ -22,9 +22,5 @@
         <field name="model_id" ref="model_article_article"/>
         <field name="domain_force">[('assigned_to.id', '=', user.partner_id.id)]</field>
         <field name="groups" eval="[(4, ref('group_article_reader'))]"/>
-        <field name="perm_read" eval="True"/>
-        <field name="perm_write" eval="True"/>
-        <field name="perm_create" eval="False"/>
-        <field name="perm_unlink" eval="False"/>
     </record>
 </odoo>

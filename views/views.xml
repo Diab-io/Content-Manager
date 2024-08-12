@@ -27,6 +27,7 @@
             </search>
         </field>
     </record>
+
     <record id="view_content_manager_form" model="ir.ui.view">
         <field name="name">article.article.form</field>
         <field name="model">article.article</field>
@@ -71,7 +72,6 @@
         <field name="model">article.article</field>
         <field name="arch" type="xml">
             <kanban default_group_by="state" class="o_kanban_mobile" sample="1" quick_create="false">
-                <field name="name"/>
                 <field name="assigned_to"/>
                 <field name="start_date"/>
                 <field name="state"/>
