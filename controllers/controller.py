@@ -1,9 +1,7 @@
 from odoo import http
 from odoo.http import request
 from datetime import datetime
-import logging
 
-_logger = logging.getLogger(__name__)
 
 class ArticleController(http.Controller):
 
@@ -15,7 +13,7 @@ class ArticleController(http.Controller):
         return data
 
     def is_date_format(self, date_string):
-        date_format = '%d/%m/%Y'
+        date_format = '%Y-%m-%d'
         try:
             datetime.strptime(date_string, date_format)
             return True
@@ -34,14 +32,14 @@ class ArticleController(http.Controller):
             deadline = kw.get('deadline')
             response = []
             """ Checks for model sanity """
-            if not assigned_to or publish_date or not content or not title or not deadline:
+            if not assigned_to or not publish_date or not content or not title or not deadline:
                 response.append('"assigned_to" "publish_date" "content" "title" "deadline" are required')
                 return self.prepare_response(response=response, stat='error')
             if not isinstance(assigned_to, int):
                 response.append('Invalid type for assigned_to please provide an integer')
                 return self.prepare_response(response=response, stat='error')
             if not self.is_date_format(publish_date) or not self.is_date_format(deadline):
-                response.append('Date fields should be in this format %d/%m/%Y')
+                response.append('Date fields should be in this format %Y-%m-%d')
                 return self.prepare_response(response=response, stat='error')
             kw['author'] = request.env.user.partner_id.id
             article_object = request.env['article.article']
@@ -67,7 +65,7 @@ class ArticleController(http.Controller):
                 return self.prepare_response(response=response, stat='error')
             deleted_record = rec.unlink()
             if deleted_record:
-                resp = {'deleted_id': deleted_record.id}
+                resp = {'deleted_id': rec.id}
                 response.append(resp)
                 return self.prepare_response(response=response, stat='success')
             response.append('An error occured while deleting record')
@@ -81,22 +79,23 @@ class ArticleController(http.Controller):
         try:
             id = int(id)
             if request.env.user.has_group('content_manager.group_article_reader'):
-                user_id = request.env.user.partner_id.id
-                user_data = request.env['article.article'].search([('assigned_to', '=', user_id)]).ids
-                if id not in user_data:
-                    response.append("You are not authorised to update data or record does not exist")
-                    return self.prepare_response(response=response, stat='error')
-                elif len(kw.values()) > 1 or not kw.get('state'):
-                    response.append("You can only update the state as an article reader")
-                    return self.prepare_response(response=response, stat='error')
+                response.append("You are not authorised to update data or record does not exist")
+                return self.prepare_response(response=response, stat='error')
 
             # check Assigned_to is of type int
-            if kw.get('assigned_to') and not isinstance(kw.get('assigned_to'), int):
-                response.append('Please provide an integer for assigned_to')
-                return self.prepare_response(response=response, stat='error')
+            assigned_to = kw.get('assigned_to')
+            if assigned_to:
+                if not isinstance(assigned_to, int):
+                    response.append('Please provide an integer for assigned_to')
+                    return self.prepare_response(response=response, stat='error')
+                else:
+                    reader = request.env['res.partner'].search([('id', '=', assigned_to)])
+                    if not reader:
+                        response.append('User does not exist: Please provide a valid user ID')
+                        return self.prepare_response(response=response, stat='error')
             
             # Prevents author from being updated
-            if kw.get('author'):
+            if 'author' in kw.keys():
                 response.append("Forbidden, you can't update the author of an article")
                 return self.prepare_response(response=response, stat='error')
 
@@ -106,13 +105,13 @@ class ArticleController(http.Controller):
                 return self.prepare_response(response=response, stat='error')
 
             write_article = rec_exists.write(kw)
-            vals = {'write_id': write_article.id}
+            vals = {'write_id': rec_exists.id}
             response.append(vals)
             return self.prepare_response(response=response, stat='success')           
         except Exception as e:
             return self.prepare_response(response=e, stat='error')
 
-    @http.route('/api/content_manager/retrieve', auth='user', type='http', methods=['GET'])
+    @http.route('/api/content_manager/retrieve', auth='user', type='json', methods=['GET'])
     def fetch_record(self, **kw):
         """ Endpoint to fetch whole data or user specific data """
         try:
