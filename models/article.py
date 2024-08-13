@@ -1,8 +1,5 @@
-from odoo import api, fields, models, _
-from odoo.exceptions import UserError
-import logging
+from odoo import fields, models, _
 
-_logger = logging.getLogger(__name__)
 
 class Articles(models.Model):
     _name = 'article.article'
@@ -51,14 +48,20 @@ class Articles(models.Model):
 
 
     def action_reading(self):
-        self.write({'state':'reading'})
         date = fields.Date.today()
-        self.write({'start_date' : date})
+        update_data = {
+            'state':'reading',
+            'start_date': date
+        }
+        self.write(update_data)
 
     def action_read(self):
-        self.write({'state':'read'})
         date = fields.Date.today()
-        self.write({'finished_date' : date})
+        update_data = {
+            'state': 'read',
+            'finished_date': date
+        }
+        self.write(update_data)
     
     def action_abandoned(self):
         self.write({'state':'abandoned'})
